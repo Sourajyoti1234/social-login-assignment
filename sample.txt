@@ -1,0 +1,45 @@
+Google, fb, twitter, linkedin
+
+linkedin{
+
+  client id  : 86hnbv6p2ocwyc
+  client secret : 7VCmpmICufk0WfHS
+
+}
+
+google{
+
+  client id  : 367578875398-j6qgvej425kkoli2o7ma4njnd7c5nerk.apps.googleusercontent.com
+
+  client secret : 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
+
+}
+
+twitter {
+  client id - ekdyQ283WllfSTdsRWw1eEdJdmM6MTpjaQ
+  client secret - G81Fx1xScEPdgHiIHT3HgUxVUMYUEt77rREnBYNainx9t8eLfV
+}
+
+
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '{your-app-id}',
+      cookie     : true,
+      xfbml      : true,
+      version    : '{api-version}'
+    });
+      
+    FB.AppEvents.logPageView();   
+      
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
