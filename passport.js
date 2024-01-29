@@ -10,6 +10,7 @@ const TwitterStrategy = require('passport-twitter').Strategy;
 
 // used to serialize the user for the session
 passport.serializeUser((user, done) => {
+  console.log('user: ',user)
   done(null, user.id);
 });
 passport.deserializeUser(async (id, done) => {
@@ -24,21 +25,19 @@ passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "http://localhost:5000/google/callback"
-}, async function (accessToken, refreshToken, profile, done) {
-
+}, async function (token, tokenSecret, profile, done) {
+  console.log('profile : ',profile);
   const id = profile.id;
   const email = profile.emails[0].value;
-  const firstName = profile.name.givenName;
-  const lastName = profile.name.familyName;
+  const name = profile._json.name;
   const profilePhoto = profile.photos[0].value;
   const source = "google";
-  const currentUser = await User.findOne({email})
+  const currentUser = await User.findOne({id})
   if (!currentUser) {
     const newUser = await new User({
       id,
       email,
-      firstName,
-      lastName,
+      name,
       profilePhoto,
       source
     })
@@ -53,6 +52,7 @@ passport.use(new GoogleStrategy({
     });
   }
   currentUser.lastVisited = new Date();
+
   return done(null, currentUser);
 }));
 
@@ -142,26 +142,25 @@ passport.use(new TwitterStrategy({
   consumerKey: process.env.TWITTER_CONSUMER_KEY,
   consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
   callbackURL: "http://localhost:5000/twitter/callback",
-}, async function (accessToken, refreshToken, profile, done) {
+  userProfileURL: "https://api.twitter.com/1.1/account/verify_credentials.json",
 
+}, async function (accessToken, tokenSecret, profile, done) {
+  console.log('profile : ',profile);
   const id = profile.id;
-  const email = profile.emails[0].value;
-  const firstName = profile.name.givenName;
-  const lastName = profile.name.familyName;
-  const profilePhoto = profile.photos[0].value;
+  const name  = profile.displayName;
+  const username = profile.username;
+  const profilePhoto = profile._json.profile_image_url
   const source = "twitter";
-  const currentUser = await User.findOne({ email })
+  const currentUser =await  User.findOne({ id })
   if (!currentUser) {
     const newUser = await new User({
       id,
-      email,
-      firstName,
-      lastName,
+      name,
+      username,
       profilePhoto,
       source
     })
     newUser.save()
-
     return done(null, newUser);
   }
   if (currentUser.source != "twitter") {

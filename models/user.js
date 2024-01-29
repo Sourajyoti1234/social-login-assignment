@@ -7,13 +7,18 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: [true, "email required"],
-    unique: [true, "email already registered"],
+    default: null,
   },
-  firstName: String,
-  lastName: String,
+  username: {
+    type: String,
+    default: null,
+  },
+
+ name:{
+  type: String,
+  default: null
+ },
   profilePhoto: String,
-  password: String,
   source: {
     type: String,
     required: [true, "source not specified"]

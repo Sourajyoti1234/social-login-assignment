@@ -7,17 +7,19 @@ const bodyParser = require('body-parser')
 
 const mongoose = require('mongoose')
 const app = express();
-app.use(session({
-  secret: 'SECRET',
-  resave: true,
-  saveUninitialized: true,
-  cookie: { secure: false, samesite: true},
-}))
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+app.use(session({
+  secret: 'SECRET',
+  resave: false,
+  saveUninitialized: false,
+  maxAge: 86400000,
+  cookie: { secure: false }
+}))
+
 
 app.use(passport.initialize());
 app.use(passport.session())
@@ -43,7 +45,9 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-app.get('/failed', (req, res) => res.send('You Failed to log in!'))
+app.get('/failed', (req, res) => {
+  
+  res.send('Failed...')})
 
 app.get('/good', (req, res) => {
   console.log('req==> : ',req.user.photos[0].value)
@@ -70,6 +74,7 @@ const isLoggedIn = (req, res, next) => {
 };
 
 app.get('/profile', isLoggedIn, (req, res) => {
+  
   res.render("profile", { user: req.user });
 })
 
@@ -81,15 +86,14 @@ app.get('/linkedin',
   }
   ));
 
-app.get('/twitter',
-  passport.authenticate('twitter', {
-    scope:[
-      'tweet.read',
-      'users.read',
-      'offline.access'
-  ]
-  }
-  ));
+app.get('/twitter',passport.authenticate('twitter'))
+app.get('/twitter/callback',
+  passport.authenticate('twitter',
+    {
+      failureRedirect: '/failed',
+      successRedirect: '/profile',
+    })
+);
 
 app.get('/facebook/callback',
   passport.authenticate('facebook', {
@@ -106,17 +110,6 @@ app.get('/linkedin/callback',
   ));
 
 
-app.get('/twitter/callback',
-  passport.authenticate('google',
-    {
-      failureRedirect: '/failed',
-      successRedirect: '/profile',
-    })
-);
-
-
-
-
 
 app.get('/logout', function (req, res) {
   req.logout();
@@ -126,6 +119,4 @@ app.get('/logout', function (req, res) {
 app.listen(PORT, () => {
   console.log(`Server is up ${PORT}`)
 })
-
-app.js
 
